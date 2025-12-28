@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SF's osu! taiko Practice Mode</title>
+  <link rel="icon" type="image/png" href="public/favicon.png">
+  <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+
+  <div id="dragOverlay">
+    <div class="drag-message">
+      📂 Drop .osu and Audio files here!<br>
+      <span style="font-size:0.6em; color:#aaa">(They will load automatically)</span>
+    </div>
+  </div>
+
+  <div id="settingsOverlay">
+    <div class="settings-box">
+      <h2>⚙️ SETTINGS</h2>
+      
+      <div class="setting-group">
+        <span class="setting-label" id="lblVolume">Volume</span>
+        <div class="volume-control">
+          <span class="volume-icon" id="volumeIcon">🔉</span>
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" />
+          <span class="volume-value" id="volumeValue">50%</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-label" id="lblStyle">Keybind Style</span>
+        <div class="style-options">
+          <div class="style-option active" data-style="KDDK">KDDK</div>
+          <div class="style-option" data-style="DKKD">DKKD</div>
+          <div class="style-option" data-style="KKDD">KKDD</div>
+          <div class="style-option" data-style="DDKK">DDKK</div>
+          <div class="style-option" data-style="KDKD">KDKD</div>
+          <div class="style-option" data-style="DKDK">DKDK</div>
+        </div>
+        <div style="margin-top: 10px; font-size: 0.85em; color: #888;">
+          K = Kat (Blue) | D = Don (Red)
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-label" id="lblCustom">Custom Keybinds</span>
+        <div id="lblBindHelp" style="font-size: 0.85em; color: #888; margin-bottom: 10px; text-align: center;">
+          Click on any key to rebind. Use Reset to restore defaults.
+        </div>
+        <div class="keybind-inputs" id="keybindInputs">
+          </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-label" id="lblLang">🌐 Language / Ngôn ngữ / 言語</span>
+        <div class="lang-selector">
+          <button class="lang-btn" data-lang="vi">Tiếng Việt</button>
+          <button class="lang-btn active" data-lang="en">English</button>
+          <button class="lang-btn" data-lang="ja">日本語</button>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-close" onclick="closeSettings()">Close</button>
+        <button onclick="resetKeybinds()" style="background:#666;" id="btnReset">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultOverlay">
+    <div class="result-box">
+      <h2 style="color:#fff; margin-top:0">RESULTS</h2>
+      <div id="resRank" class="result-rank rank-S">S</div>
+      <div style="font-size:24px; font-weight:bold; margin:10px 0; color:#fff" id="resScore">000000</div>
+      
+      <div class="result-stats">
+        <div class="stat-row"><span class="perfect">Perfect (300)</span> <span class="stat-val" id="res300">0</span></div>
+        <div class="stat-row"><span class="good">Good (100)</span> <span class="stat-val" id="res100">0</span></div>
+        <div class="stat-row"><span class="miss">Miss</span> <span class="stat-val" id="resMiss">0</span></div>
+        <div class="stat-row"><span>Max Combo</span> <span class="stat-val" id="resCombo">0</span></div>
+        <div class="stat-row"><span>Accuracy</span> <span class="stat-val" id="resAcc">0.00%</span></div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-close" onclick="closeResults()">Close</button>
+        <button class="btn-retry" onclick="retryGame()">Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+    
+    <div style="margin-left: 20px;">
+      <input type="file" id="osuFile" accept=".osu" style="display:none">
+      <button onclick="document.getElementById('osuFile').click()">1. Select .osu File</button>
+      <span id="osuLabel" style="color:#aaa; margin-left:5px">Not selected</span>
+    </div>
+    <div>
+      <input type="file" id="audioFile" accept="audio/*" style="display:none">
+      <button onclick="document.getElementById('audioFile').click()">2. Select Audio</button>
+      <span id="audioLabel" style="color:#aaa; margin-left:5px">Not selected</span>
+    </div>
+    <button id="playBtn">PLAY</button>
+  </div>
+
+  <div style="display:flex; justify-content:center; margin-top:10px;">
+    <div class="stats-panel">
+      <span id="disp-od">OD: --</span>
+      <span id="disp-hp">HP: --</span>
+      <span id="disp-sv">SV: --</span>
+    </div>
+  </div>
+
+  <canvas id="game" width="800" height="400"></canvas>
+  <div class="guide" id="keybindGuide"></div>
+
+  <div class="footer">
+    <div class="version">Version 1.0</div>
+    <div class="credits">
+      Made by <a href="https://osu.ppy.sh/users/19207842" target="_blank">-[SnowFlakes]-</a> | 
+      Inspired by <a href="https://osu.ppy.sh/users/22069182" target="_blank">nahieu2005</a>
+    </div>
+  </div>
+
+  <script src="src/js/main.js"></script>
+</body>
+</html>
