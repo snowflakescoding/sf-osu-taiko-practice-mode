@@ -74,7 +74,6 @@ function updateLanguage() {
   
   const osuLabel = document.getElementById('osuLabel');
   const audioLabel = document.getElementById('audioLabel');
-  // Only update labels if they show "Not Selected"
   const notSelArr = [translations.vi.notSelected, translations.en.notSelected, translations.ja.notSelected];
   if (notSelArr.includes(osuLabel.innerText)) osuLabel.innerText = t('notSelected');
   if (notSelArr.includes(audioLabel.innerText)) audioLabel.innerText = t('notSelected');
@@ -270,7 +269,7 @@ function renderKeybindInputs() {
         this.style.transform = 'scale(1)';
         document.removeEventListener('keydown', handler);
         saveSettings();
-        renderKeybindInputs(); // Re-render to format text
+        renderKeybindInputs(); 
         updateKeybindGuide();
       };
       document.addEventListener('keydown', handler);
@@ -280,7 +279,7 @@ function renderKeybindInputs() {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-  loadSettings(); // LOAD SAVED SETTINGS
+  loadSettings(); 
 
   document.querySelectorAll('.style-option').forEach(option => {
     option.addEventListener('click', function() {
@@ -317,7 +316,7 @@ window.addEventListener('dragover', (e) => {
 });
 
 window.addEventListener('dragleave', (e) => {
-  if (e.clientX === 0 && e.clientY === 0) { // Only hide if leaving window
+  if (e.clientX === 0 && e.clientY === 0) {
     dragOverlay.style.display = 'none';
   }
 });
@@ -530,16 +529,27 @@ function retryGame() {
 }
 
 function drawUI() {
+  // Score
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 30px monospace';
   ctx.textAlign = 'right';
   ctx.fillText(score.toString().padStart(7, '0'), canvas.width - 20, 50);
+
+  // Combo (MOVED to Track)
   if (combo > 0) {
+    ctx.save(); 
     ctx.fillStyle = '#ffcc00';
-    ctx.font = 'bold 50px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillText(combo + 'x', 20, 320);
+    ctx.font = 'bold 60px Arial'; 
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 10;
+    // Draw at X=80 (left of hit circle), Y=160 (center of track)
+    ctx.fillText(combo, 80, 160);
+    ctx.restore(); 
   }
+
+  // HP Bar
   const hpW = 400; const hpH = 15; const hpX = HIT_X; const hpY = 30;
   ctx.fillStyle = '#444'; ctx.fillRect(hpX, hpY, hpW, hpH);
   ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.strokeRect(hpX, hpY, hpW, hpH);
