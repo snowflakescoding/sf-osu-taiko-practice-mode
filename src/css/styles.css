@@ -5,7 +5,11 @@ body {
   color: #eee;
   text-align: center;
   margin: 0;
-  overflow: hidden;
+  /* CHANGED: Allow vertical scrolling so you can see the footer/controls on small screens */
+  overflow-y: auto; 
+  /* Prevent accidental horizontal scrolling */
+  overflow-x: hidden;
+  padding-bottom: 20px;
 }
 
 /* DRAG & DROP OVERLAY */
@@ -28,17 +32,20 @@ body {
   font-size: 2em;
   font-weight: bold;
   text-align: center;
+  padding: 20px;
 }
 
 /* CONTROLS BAR */
 .controls {
   background: #2a2a2a;
-  padding: 10px;
+  padding: 15px;
   border-bottom: 2px solid #444;
   display: flex;
   justify-content: center;
-  gap: 20px;
   align-items: center;
+  gap: 15px;
+  /* CHANGED: Allow buttons to wrap to the next line on small screens */
+  flex-wrap: wrap; 
   font-size: 14px;
 }
 
@@ -53,6 +60,11 @@ body {
   color: #ffcc00;
   font-family: monospace;
   font-size: 1.1em;
+  /* CHANGED: Ensure it doesn't overflow screen */
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 90%;
+  margin: 10px auto;
 }
 
 /* GAME CANVAS */
@@ -62,6 +74,12 @@ canvas {
   margin: 10px auto;
   border: 4px solid #444;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  /* CHANGED: Make canvas responsive */
+  max-width: 95%; /* Shrink to fit width */
+  height: auto;   /* Maintain aspect ratio */
+  /* Optional: Limit height so it fits on laptop screens without scrolling */
+  max-height: 60vh; 
+  object-fit: contain;
 }
 
 /* BUTTONS */
@@ -74,11 +92,17 @@ button {
   cursor: pointer;
   border-radius: 4px;
   transition: 0.2s;
+  white-space: nowrap; /* Prevent text inside buttons from breaking weirdly */
 }
 button:hover { background: #ff8533; transform: scale(1.05); }
 button:focus { outline: none; }
 
-.guide { font-size: 0.85em; color: #888; margin-top: 5px; }
+.guide { 
+  font-size: 0.85em; 
+  color: #888; 
+  margin-top: 5px; 
+  padding: 0 10px; /* Prevent text touching edges */
+}
 
 /* RESULT SCREEN (MODAL) */
 #resultOverlay {
@@ -90,6 +114,8 @@ button:focus { outline: none; }
   z-index: 100;
   justify-content: center;
   align-items: center;
+  padding: 20px; /* Padding for mobile */
+  box-sizing: border-box;
 }
 
 .result-box {
@@ -98,6 +124,8 @@ button:focus { outline: none; }
   border-radius: 10px;
   border: 2px solid #ffcc00;
   width: 400px;
+  /* CHANGED: Responsive modal size */
+  max-width: 100%; 
   text-align: center;
   box-shadow: 0 0 50px rgba(255, 102, 0, 0.5);
 }
@@ -148,6 +176,8 @@ button:focus { outline: none; }
   z-index: 100;
   justify-content: center;
   align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .settings-box {
@@ -156,6 +186,10 @@ button:focus { outline: none; }
   border-radius: 10px;
   border: 2px solid #666;
   width: 500px;
+  /* CHANGED: Handle overflow on small screens */
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto; 
   text-align: left;
   box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
@@ -184,7 +218,7 @@ button:focus { outline: none; }
 
 .style-options {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr); /* Ensure 3 per row */
   gap: 10px;
   margin-top: 10px;
 }
@@ -216,6 +250,7 @@ button:focus { outline: none; }
   justify-content: center;
   gap: 15px;
   margin-top: 15px;
+  flex-wrap: wrap; /* Wrap keys if screen is narrow */
 }
 
 .key-input-group {
@@ -254,7 +289,7 @@ button:focus { outline: none; }
   border: 3px solid #555;
   color: #fff;
   font-weight: bold;
-  font-size: 1.5em; /* Adjusted to fit longer text */
+  font-size: 1.5em; 
   border-radius: 8px;
   text-transform: uppercase;
   cursor: pointer;
@@ -289,6 +324,8 @@ button:focus { outline: none; }
   padding: 5px;
   border-radius: 5px;
   border: 1px solid #555;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .lang-btn {
@@ -301,6 +338,7 @@ button:focus { outline: none; }
   border-radius: 3px;
   transition: 0.2s;
   font-weight: bold;
+  flex: 1; /* Equal width buttons */
 }
 
 .lang-btn:hover {
