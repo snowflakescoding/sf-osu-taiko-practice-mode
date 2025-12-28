@@ -1,6 +1,6 @@
-# SF's osu! Taiko Practice Mode 🥁
+# SnowFlakes' osu! Taiko Practice Mode 🥁
 
-A lightweight, web-based practice tool for osu!taiko, running entirely in the browser with Vanilla JS.
+A lightweight, web-based practice tool for osu! taiko, running entirely in the browser with Vanilla JS.
 
 ## 🌟 Features
 - **File Parsing**: Drag & Drop your `.osu` beatmaps and `.mp3` audio files.
