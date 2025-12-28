@@ -535,18 +535,12 @@ function drawUI() {
   ctx.textAlign = 'right';
   ctx.fillText(score.toString().padStart(7, '0'), canvas.width - 20, 50);
 
-  // Combo (MOVED to Track)
+  // Combo (REVERTED TO BOTTOM LEFT)
   if (combo > 0) {
-    ctx.save(); 
     ctx.fillStyle = '#ffcc00';
-    ctx.font = 'bold 60px Arial'; 
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 10;
-    // Draw at X=80 (left of hit circle), Y=160 (center of track)
-    ctx.fillText(combo, 80, 160);
-    ctx.restore(); 
+    ctx.font = 'bold 50px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(combo + 'x', 20, 320);
   }
 
   // HP Bar
