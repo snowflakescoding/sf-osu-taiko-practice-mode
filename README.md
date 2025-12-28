@@ -4,6 +4,12 @@ A lightweight, web-based practice tool for osu! Taiko, running entirely in the b
 
 Try it here: https://sf-osu-taiko-practice-mode.vercel.app/
 
+## 👤 Author // Insprirer
+
+[SnowFlakes (author)](https://osu.ppy.sh/users/19207842)
+
+[nahieu2005 (inspirer)](https://osu.ppy.sh/users/22069182)
+
 ## 🌟 Features
 - **File Parsing**: Drag & Drop your `.osu` beatmaps and `.mp3` audio files.
 - **Customizable**: Change volume, keybinds (KDDK, DDKK, etc.), and language (EN/VI/JA).
@@ -19,7 +25,6 @@ Try it here: https://sf-osu-taiko-practice-mode.vercel.app/
 - `index.html`: Main entry point.
 - `src/js/main.js`: Core game logic, file parsing, and event handling.
 - `src/css/style.css`: Styling for the game interface and settings modal.
-- `public/`: Static assets (icons, demo maps).
 
 ## 🎮 Controls
 - **Default**: `A` (Kat), `S` (Don), `K` (Don), `L` (Kat)
@@ -33,6 +38,4 @@ Try it here: https://sf-osu-taiko-practice-mode.vercel.app/
 - LocalStorage API
 
 ---
-*Creator by -[SnowFlakes]-, follow me here: https://osu.ppy.sh/users/19207842*
-
-*Inspired by nahieu2005, follow him here: https://osu.ppy.sh/users/22069182*
+*Last update: December 28, 2025*
