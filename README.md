@@ -32,4 +32,5 @@ A lightweight, web-based practice tool for osu!taiko, running entirely in the br
 
 ---
 *Creator by -[SnowFlakes]-, follow me here: https://osu.ppy.sh/users/19207842*
+
 *Inspired by nahieu2005, follow him here: https://osu.ppy.sh/users/22069182*
