@@ -53,7 +53,10 @@ Experience a specialized scoring system inspired by CHUNITHM. For more details, 
 
 ## 📝 Changelog
 
-### **v2025.1.7: Final Polish & Alignment**
+### **v2025.1.8: Adding favicon for the website**
+- Favicon added, named **favicon.png**
+
+### **v2025.1.7: New Polish & Alignment**
 - **UI Update**: Moved the **Pause Button** to the bottom-right of the playfield with a transparent, floating style.
 - **SV Logic**: The stats panel (`SV: x.x`) now displays the user's custom setting directly, ignoring the map's internal SV for clarity.
 - **Bug Fix**: Fixed hit effect text rendering (replaced Japanese characters with "GREAT/GOOD/MISS" to prevent missing font issues).
