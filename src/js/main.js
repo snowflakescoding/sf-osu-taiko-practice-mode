@@ -107,9 +107,10 @@ function updateResultsModal() {
   document.querySelector('.btn-retry').innerText = t('retry');
 }
 
-// --- PERSISTENCE (LocalStorage) ---
+// --- PERSISTENCE ---
 function saveSettings() {
   localStorage.setItem('taiko_vol', currentVolume);
+  localStorage.setItem('taiko_sv', userScrollSpeed);
   localStorage.setItem('taiko_style', currentStyle);
   localStorage.setItem('taiko_binds', JSON.stringify(keybinds));
   localStorage.setItem('taiko_lang', currentLang);
@@ -121,6 +122,13 @@ function loadSettings() {
     currentVolume = parseInt(vol);
     document.getElementById('volumeSlider').value = currentVolume;
     updateVolume(currentVolume);
+  }
+
+  const sv = localStorage.getItem('taiko_sv');
+  if (sv !== null) {
+    userScrollSpeed = parseFloat(sv);
+    document.getElementById('svSlider').value = Math.round(userScrollSpeed * 10);
+    document.getElementById('svValue').innerText = userScrollSpeed.toFixed(1);
   }
 
   const style = localStorage.getItem('taiko_style');
@@ -143,10 +151,11 @@ function loadSettings() {
   updateLanguage();
 }
 
-// --- KEYBINDS SYSTEM ---
+// --- KEYBINDS & SETTINGS ---
 let currentStyle = 'KDDK';
 let keybinds = { key1: 'a', key2: 's', key3: 'k', key4: 'l' };
 let currentVolume = 50; 
+let userScrollSpeed = 1.0; 
 
 function updateVolume(value) {
   currentVolume = value;
@@ -162,6 +171,12 @@ function updateVolumeIcon(value) {
   else if (value < 33) icon.innerText = '🔈';
   else if (value < 66) icon.innerText = '🔉';
   else icon.innerText = '🔊';
+}
+
+function updateSV(value) {
+  userScrollSpeed = value / 10; 
+  document.getElementById('svValue').innerText = userScrollSpeed.toFixed(1);
+  saveSettings();
 }
 
 const STYLE_MAPPINGS = {
@@ -305,6 +320,34 @@ document.addEventListener('DOMContentLoaded', () => {
   volumeSlider.addEventListener('input', (e) => {
     updateVolume(parseInt(e.target.value));
   });
+
+  // SV Slider Listener
+  const svSlider = document.getElementById('svSlider');
+  svSlider.addEventListener('input', (e) => {
+    updateSV(parseInt(e.target.value));
+  });
+
+  // SV BUTTONS LISTENERS
+  const btnSvDec = document.getElementById('btnSvDec');
+  const btnSvInc = document.getElementById('btnSvInc');
+
+  btnSvDec.addEventListener('click', () => {
+    let val = parseInt(svSlider.value);
+    if (val > 1) {
+      val--;
+      svSlider.value = val;
+      updateSV(val);
+    }
+  });
+
+  btnSvInc.addEventListener('click', () => {
+    let val = parseInt(svSlider.value);
+    if (val < 100) {
+      val++;
+      svSlider.value = val;
+      updateSV(val);
+    }
+  });
 });
 
 // --- DRAG & DROP SUPPORT ---
@@ -342,6 +385,82 @@ window.addEventListener('drop', (e) => {
     }
   }
 });
+
+// --- PAUSE SYSTEM ---
+let isPaused = false;
+
+function togglePause() {
+  if (!playing && !isPaused) return; 
+  
+  if (isPaused) {
+    // Already paused
+  } else {
+    isPaused = true;
+    if(audio) audio.pause();
+    document.getElementById('pauseOverlay').style.display = 'flex';
+  }
+}
+
+function resumeGame() {
+  document.getElementById('pauseOverlay').style.display = 'none';
+  const cd = document.getElementById('countdownOverlay');
+  const txt = document.getElementById('countdownText');
+  cd.style.display = 'flex';
+  
+  let count = 3;
+  txt.innerText = count;
+  
+  const timer = setInterval(() => {
+    count--;
+    if (count > 0) {
+      txt.innerText = count;
+      txt.style.animation = 'none';
+      txt.offsetHeight; 
+      txt.style.animation = 'popIn 0.5s ease-out';
+    } else {
+      clearInterval(timer);
+      cd.style.display = 'none';
+      if(audio) audio.play();
+      isPaused = false;
+      requestAnimationFrame(() => { update(); draw(); });
+    }
+  }, 1000);
+}
+
+function retryGame() {
+  document.getElementById('pauseOverlay').style.display = 'none';
+  isPaused = false;
+  
+  if (cachedOsuText && audio) {
+    parseOsu(cachedOsuText);
+    audio.volume = currentVolume / 100;
+    audio.currentTime = 0;
+    audio.play();
+    playing = true;
+    isFinished = false;
+    requestAnimationFrame(() => { update(); draw(); });
+  }
+}
+
+function quitGame() {
+  document.getElementById('pauseOverlay').style.display = 'none';
+  isPaused = false;
+  playing = false;
+  isFinished = false;
+  
+  if(audio) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+  
+  score = 0;
+  combo = 0;
+  hpCurrent = 0;
+  hitEffects = [];
+  
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  draw(); 
+}
 
 // --- GAME ENGINE ---
 const BASE_SPEED = 0.5; 
@@ -410,7 +529,8 @@ function parseOsu(text) {
 }
 
 function update() {
-  if (!playing) return;
+  if (!playing || isPaused) return; 
+  
   const now = (audio.currentTime * 1000);
   for (let n of notes) {
     if (!n.hit && !n.missed && n.time < now - window100) {
@@ -442,8 +562,9 @@ function draw() {
   ctx.fill();
 
   if (!playing && !isFinished) return;
+  
   const now = audio ? (audio.currentTime * 1000) : 0;
-  const currentSpeed = BASE_SPEED * meta.sv;
+  const currentSpeed = BASE_SPEED * meta.sv * userScrollSpeed;
 
   for (let i = notes.length - 1; i >= 0; i--) {
     let n = notes[i];
@@ -463,21 +584,31 @@ function draw() {
   updateAndDrawEffects();
   drawUI();
   drawURBar();
-  if (playing) {
+  if (playing && !isPaused) {
     requestAnimationFrame(() => { update(); draw(); });
   }
 }
 
 function triggerHitEffect(text, points) {
   hitEffects.push({ text: text, spawnTime: performance.now() });
+  
+  const scorePerNote = 1010000 / (stats.totalNotes || 1); 
+  
   if (text === 'MISS') {
     stats.miss++;
   } else {
     combo++;
     if (combo > maxCombo) maxCombo = combo;
-    score += points + Math.min(combo, 100) * 10;
-    if (text === '300') stats.perfect++;
-    else if (text === '100') stats.good++;
+    
+    if (text === '300') {
+      stats.perfect++;
+      score += scorePerNote;
+    }
+    else if (text === '100') {
+      stats.good++;
+      score += scorePerNote * 0.5;
+    }
+    
     const gain = (200 / (stats.totalNotes || 100)) * (1 + (10 - meta.hp)/20);
     hpCurrent = Math.min(HP_MAX, hpCurrent + (text === '300' ? gain : gain * 0.5));
   }
@@ -486,18 +617,31 @@ function triggerHitEffect(text, points) {
 function finishGame() {
   playing = false;
   isFinished = true;
+  
+  const finalScore = Math.floor(score);
+  
+  let rank = 'D';
+  let rankClass = 'rank-D';
+  
+  if (finalScore >= 1009000) { rank = 'SSS+'; rankClass = 'rank-S'; }
+  else if (finalScore >= 1007500) { rank = 'SSS'; rankClass = 'rank-S'; }
+  else if (finalScore >= 1005000) { rank = 'SS+'; rankClass = 'rank-S'; }
+  else if (finalScore >= 1000000) { rank = 'SS'; rankClass = 'rank-S'; }
+  else if (finalScore >= 990000) { rank = 'S+'; rankClass = 'rank-S'; }
+  else if (finalScore >= 975000) { rank = 'S'; rankClass = 'rank-S'; }
+  else if (finalScore >= 950000) { rank = 'AAA'; rankClass = 'rank-A'; }
+  else if (finalScore >= 925000) { rank = 'AA'; rankClass = 'rank-A'; }
+  else if (finalScore >= 900000) { rank = 'A'; rankClass = 'rank-A'; }
+  else if (finalScore >= 800000) { rank = 'BBB'; rankClass = 'rank-B'; }
+  else if (finalScore >= 700000) { rank = 'BB'; rankClass = 'rank-B'; }
+  else if (finalScore >= 600000) { rank = 'B'; rankClass = 'rank-B'; }
+  else if (finalScore >= 500000) { rank = 'C'; rankClass = 'rank-C'; }
+  
   const totalHits = stats.perfect + stats.good + stats.miss;
   const acc = totalHits === 0 ? 0 : 
     ((stats.perfect * 100 + stats.good * 50) / (totalHits * 100)) * 100;
-  let rank = 'D';
-  let rankClass = 'rank-D';
-  if (acc === 100) { rank = 'SS'; rankClass = 'rank-S'; }
-  else if (acc >= 95) { rank = 'S'; rankClass = 'rank-S'; }
-  else if (acc >= 90) { rank = 'A'; rankClass = 'rank-A'; }
-  else if (acc >= 80) { rank = 'B'; rankClass = 'rank-B'; }
-  else if (acc >= 70) { rank = 'C'; rankClass = 'rank-C'; }
   
-  document.getElementById('resScore').innerText = score.toLocaleString();
+  document.getElementById('resScore').innerText = finalScore.toLocaleString();
   document.getElementById('resRank').innerText = rank;
   document.getElementById('resRank').className = 'result-rank ' + rankClass;
   document.getElementById('res300').innerText = stats.perfect;
@@ -515,31 +659,20 @@ function closeResults() {
   draw(); 
 }
 
-function retryGame() {
-  closeResults();
-  if (cachedOsuText && audio) {
-    parseOsu(cachedOsuText);
-    audio.volume = currentVolume / 100; 
-    audio.currentTime = 0;
-    audio.play();
-    playing = true;
-    isFinished = false;
-    requestAnimationFrame(() => { update(); draw(); });
-  }
-}
-
 function drawUI() {
   // Score
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 30px monospace';
   ctx.textAlign = 'right';
-  ctx.fillText(score.toString().padStart(7, '0'), canvas.width - 20, 50);
+  ctx.fillText(Math.floor(score).toLocaleString().padStart(7, '0'), canvas.width - 20, 50);
 
-  // Combo (REVERTED TO BOTTOM LEFT)
+  // Combo (Reverted to bottom left)
   if (combo > 0) {
     ctx.fillStyle = '#ffcc00';
     ctx.font = 'bold 50px Arial';
     ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic'; // Reset baseline from previous change
+    ctx.shadowBlur = 0; // Remove shadow
     ctx.fillText(combo + 'x', 20, 320);
   }
 
@@ -596,32 +729,32 @@ function drawURBar() {
 }
 
 function tryHit(inputType) {
-  if (!playing) return;
+  if (!playing || isPaused) return; 
   const now = (audio.currentTime * 1000);
   for (let n of notes) {
-    if (n.hit || n.missed) continue;
-    const diff = n.time - now; 
-    const absDiff = Math.abs(diff);
-    if (absDiff <= window100) {
-      if (n.type === inputType) {
-        n.hit = true;
-        hitErrors.push(diff);
-        if (absDiff <= window300) triggerHitEffect('300', 300);
-        else triggerHitEffect('100', 100);
-      } else {
-        n.missed = true;
-        triggerHitEffect('MISS', 0);
-        combo = 0;
-        hpCurrent = Math.max(0, hpCurrent - 2);
-      }
-      return; 
+    if (!n.hit && !n.missed && n.time < now - window100) {
+      n.missed = true;
+      triggerHitEffect('MISS', 0);
+      combo = 0;
+      hpCurrent = Math.max(0, hpCurrent - (meta.hp * 0.5));
     }
   }
 }
 
 window.addEventListener('keydown', e => {
   if (e.repeat) return;
+  
+  if (e.key === 'Escape') {
+    if (playing) {
+      togglePause();
+    }
+    return;
+  }
+
   if (e.key === ' ') { e.preventDefault(); } 
+  
+  if (isPaused) return;
+
   const k = e.key.toLowerCase();
   const keyMap = getKeyMapping();
   if (keyMap[k]) {

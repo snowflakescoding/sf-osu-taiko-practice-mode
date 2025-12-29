@@ -16,6 +16,19 @@
     </div>
   </div>
 
+  <div id="pauseOverlay">
+    <div class="pause-box">
+      <h2>PAUSED</h2>
+      <button class="pause-btn" onclick="resumeGame()">Continue</button>
+      <button class="pause-btn" onclick="retryGame()">Retry</button>
+      <button class="pause-btn quit-btn" onclick="quitGame()">Quit</button>
+    </div>
+  </div>
+
+  <div id="countdownOverlay">
+    <div id="countdownText">3</div>
+  </div>
+
   <div id="settingsOverlay">
     <div class="settings-box">
       <h2>⚙️ SETTINGS</h2>
@@ -28,6 +41,20 @@
             <span class="volume-icon" id="volumeIcon">🔉</span>
             <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" />
             <span class="volume-value" id="volumeValue">50%</span>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <span class="setting-label">Scroll Speed (SV)</span>
+          <div class="volume-control">
+            <span class="volume-icon">⏩</span>
+            <button class="sv-btn" id="btnSvDec">-</button>
+            
+            <input type="range" class="volume-slider" id="svSlider" min="1" max="100" value="10" />
+            
+            <button class="sv-btn" id="btnSvInc">+</button>
+            
+            <span class="volume-value" id="svValue">1.0</span>
           </div>
         </div>
 
@@ -75,11 +102,11 @@
     <div class="result-box">
       <h2 style="color:#fff; margin-top:0">RESULTS</h2>
       <div id="resRank" class="result-rank rank-S">S</div>
-      <div style="font-size:24px; font-weight:bold; margin:10px 0; color:#fff" id="resScore">000000</div>
+      <div style="font-size:32px; font-weight:bold; margin:10px 0; color:#fff" id="resScore">000000</div>
       
       <div class="result-stats">
-        <div class="stat-row"><span class="perfect">Perfect (300)</span> <span class="stat-val" id="res300">0</span></div>
-        <div class="stat-row"><span class="good">Good (100)</span> <span class="stat-val" id="res100">0</span></div>
+        <div class="stat-row"><span class="perfect">Perfect</span> <span class="stat-val" id="res300">0</span></div>
+        <div class="stat-row"><span class="good">Good</span> <span class="stat-val" id="res100">0</span></div>
         <div class="stat-row"><span class="miss">Miss</span> <span class="stat-val" id="resMiss">0</span></div>
         <div class="stat-row"><span>Max Combo</span> <span class="stat-val" id="resCombo">0</span></div>
         <div class="stat-row"><span>Accuracy</span> <span class="stat-val" id="resAcc">0.00%</span></div>
@@ -119,6 +146,7 @@
   <div class="guide" id="keybindGuide"></div>
 
   <div class="footer">
+    <div class="version">Version 2025.1.4</div>
     <div class="credits">
       Made by <a href="https://osu.ppy.sh/users/19207842" target="_blank">-[SnowFlakes]-</a> | 
       Inspired by <a href="https://osu.ppy.sh/users/22069182" target="_blank">nahieu2005</a>
