@@ -184,11 +184,10 @@ function updateSV(value) {
   saveSettings();
 }
 
-// Helper to update displayed stats (OD/HP/SV)
 function updateStatsDisplay() {
   document.getElementById('disp-od').innerText = `OD: ${meta.od || '--'}`;
   document.getElementById('disp-hp').innerText = `HP: ${meta.hp || '--'}`;
-  // FIXED: Show only the User Multiplier (e.g., "1.0") as requested
+  // Show only user SV multiplier
   document.getElementById('disp-sv').innerText = `SV: ${userScrollSpeed.toFixed(1)}`;
 }
 
@@ -334,13 +333,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateVolume(parseInt(e.target.value));
   });
 
-  // SV Slider Listener
   const svSlider = document.getElementById('svSlider');
   svSlider.addEventListener('input', (e) => {
     updateSV(parseInt(e.target.value));
   });
 
-  // SV BUTTONS LISTENERS
   const btnSvDec = document.getElementById('btnSvDec');
   const btnSvInc = document.getElementById('btnSvInc');
 
@@ -363,7 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// --- DRAG & DROP SUPPORT ---
 const dragOverlay = document.getElementById('dragOverlay');
 
 window.addEventListener('dragover', (e) => {
@@ -532,8 +528,6 @@ function parseOsu(text) {
   }
   notes.sort((a, b) => a.time - b.time);
   stats.totalNotes = notes.length;
-  
-  // NEW: Update display stats with ONLY user SV
   updateStatsDisplay();
 
   window300 = 80 - 6 * meta.od;
@@ -547,7 +541,7 @@ function update() {
   
   const now = (audio.currentTime * 1000);
   for (let n of notes) {
-    if (n.hit || n.missed && n.time < now - window100) {
+    if (!n.hit && !n.missed && n.time < now - window100) {
       n.missed = true;
       triggerHitEffect('MISS', 0);
       combo = 0;
@@ -680,13 +674,13 @@ function drawUI() {
   ctx.textAlign = 'right';
   ctx.fillText(Math.floor(score).toLocaleString().padStart(7, '0'), canvas.width - 20, 50);
 
-  // Combo (Reverted to bottom left)
+  // Combo - UPDATED to be slightly higher (320px) and safer
   if (combo > 0) {
     ctx.fillStyle = '#ffcc00';
     ctx.font = 'bold 50px Arial';
     ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic'; // Reset baseline from previous change
-    ctx.shadowBlur = 0; // Remove shadow
+    ctx.textBaseline = 'alphabetic'; 
+    ctx.shadowBlur = 0; 
     ctx.fillText(combo + 'x', 20, 320);
   }
 
@@ -700,6 +694,7 @@ function drawUI() {
   ctx.fillStyle = '#fff'; ctx.fillRect(hpX + hpW * 0.5, hpY - 5, 2, hpH + 10);
 }
 
+// FIX: Updated to use English text to avoid "question mark" squares
 function updateAndDrawEffects() {
   const now = performance.now();
   for (let i = hitEffects.length - 1; i >= 0; i--) {
@@ -709,12 +704,14 @@ function updateAndDrawEffects() {
     const yOffset = age * 0.15; 
     const alpha = 1 - (age / 400);
     ctx.save(); ctx.globalAlpha = alpha; ctx.textAlign = 'center';
+    
+    // CHANGED: Use English text to fix rendering issues
     if (eff.text === '300') { 
-        ctx.fillStyle = '#f6d123'; ctx.font = 'bold 45px Arial'; ctx.fillText("良", HIT_X, 100 - yOffset);
+        ctx.fillStyle = '#f6d123'; ctx.font = 'bold 45px Arial'; ctx.fillText("GREAT", HIT_X, 100 - yOffset);
     } else if (eff.text === '100') {
-        ctx.fillStyle = '#fff'; ctx.font = 'bold 40px Arial'; ctx.fillText("可", HIT_X, 100 - yOffset);
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 40px Arial'; ctx.fillText("GOOD", HIT_X, 100 - yOffset);
     } else {
-        ctx.fillStyle = '#666'; ctx.font = 'bold 40px Arial'; ctx.fillText("不可", HIT_X, 100 - yOffset);
+        ctx.fillStyle = '#666'; ctx.font = 'bold 40px Arial'; ctx.fillText("MISS", HIT_X, 100 - yOffset);
     }
     ctx.restore();
   }
@@ -759,7 +756,7 @@ function tryHit(inputType) {
         n.missed = true;
         triggerHitEffect('MISS', 0);
         combo = 0;
-        hpCurrent = Math.max(0, hpCurrent - (meta.hp * 0.5));
+        hpCurrent = Math.max(0, hpCurrent - 2);
       }
       return; 
     }
