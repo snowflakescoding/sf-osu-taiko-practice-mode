@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SF's osu! taiko Practice Mode</title>
-  <link rel="icon" type="image/png" href="public/favicon.png">
   <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body>
@@ -45,15 +44,11 @@
         </div>
 
         <div class="setting-group">
-          <span class="setting-label">Scroll Speed (SV)</span>
+          <span class="setting-label" id="lblSv">⏩ Slider Velocity (SV)</span>
           <div class="volume-control">
-            <span class="volume-icon">⏩</span>
             <button class="sv-btn" id="btnSvDec">-</button>
-            
             <input type="range" class="volume-slider" id="svSlider" min="1" max="100" value="10" />
-            
             <button class="sv-btn" id="btnSvInc">+</button>
-            
             <span class="volume-value" id="svValue">1.0</span>
           </div>
         </div>
@@ -145,8 +140,10 @@
   <canvas id="game" width="800" height="400"></canvas>
   <div class="guide" id="keybindGuide"></div>
 
+  <button id="floatingPauseBtn" onclick="togglePause()">⏸️ Pause</button>
+
   <div class="footer">
-    <div class="version">Version 2025.1.4</div>
+    <div class="version">Version 2025.1.6</div>
     <div class="credits">
       Made by <a href="https://osu.ppy.sh/users/19207842" target="_blank">-[SnowFlakes]-</a> | 
       Inspired by <a href="https://osu.ppy.sh/users/22069182" target="_blank">nahieu2005</a>

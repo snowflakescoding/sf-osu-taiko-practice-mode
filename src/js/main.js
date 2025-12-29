@@ -22,7 +22,8 @@ const translations = {
     keybinds: 'Phím bấm', results: 'KẾT QUẢ',
     perfect: 'Hoàn Hảo (300)', good: 'Tốt (100)', miss: 'Trượt',
     maxCombo: 'Combo Tối Đa', accuracy: 'Độ Chính Xác', retry: 'Chơi Lại',
-    missingFiles: 'Thiếu File!', volume: 'Âm Lượng', langLabel: '🌐 Ngôn ngữ'
+    missingFiles: 'Thiếu File!', volume: 'Âm Lượng', langLabel: '🌐 Ngôn ngữ',
+    svLabel: '⏩ Vận tốc Thanh trượt (SV)'
   },
   en: {
     settings: '⚙️ Settings',
@@ -41,7 +42,8 @@ const translations = {
     keybinds: 'Keybinds', results: 'RESULTS',
     perfect: 'Perfect (300)', good: 'Good (100)', miss: 'Miss',
     maxCombo: 'Max Combo', accuracy: 'Accuracy', retry: 'Retry',
-    missingFiles: 'Missing Files!', volume: 'Volume', langLabel: '🌐 Language'
+    missingFiles: 'Missing Files!', volume: 'Volume', langLabel: '🌐 Language',
+    svLabel: '⏩ Slider Velocity (SV)'
   },
   ja: {
     settings: '⚙️ 設定',
@@ -60,7 +62,8 @@ const translations = {
     keybinds: 'キー設定', results: '結果',
     perfect: '良 (300)', good: '可 (100)', miss: '不可',
     maxCombo: '最大コンボ', accuracy: '精度', retry: 'リトライ',
-    missingFiles: 'ファイルがありません！', volume: '音量', langLabel: '🌐 言語'
+    missingFiles: 'ファイルがありません！', volume: '音量', langLabel: '🌐 言語',
+    svLabel: '⏩ スライダー・ベロシティ(SV)'
   }
 };
 
@@ -87,6 +90,7 @@ function updateLanguage() {
 function updateSettingsModal() {
   document.querySelector('.settings-box h2').innerHTML = t('settingsTitle');
   document.getElementById('lblVolume').innerText = t('volume');
+  document.getElementById('lblSv').innerText = t('svLabel'); 
   document.getElementById('lblStyle').innerText = t('keybindStyle');
   document.getElementById('lblCustom').innerText = t('customKeybinds');
   document.getElementById('lblBindHelp').innerText = t('clickToRebind');
@@ -176,7 +180,20 @@ function updateVolumeIcon(value) {
 function updateSV(value) {
   userScrollSpeed = value / 10; 
   document.getElementById('svValue').innerText = userScrollSpeed.toFixed(1);
+  // NEW: Update Stats Panel
+  updateStatsDisplay();
   saveSettings();
+}
+
+// Helper to update displayed stats (OD/HP/SV)
+function updateStatsDisplay() {
+  // If we haven't loaded a map yet, show default/empty
+  const baseSV = meta.sv || 1.4; // default if not loaded
+  const displaySV = (meta.sv) ? `${meta.sv} (x${userScrollSpeed.toFixed(1)})` : '--';
+  
+  document.getElementById('disp-od').innerText = `OD: ${meta.od || '--'}`;
+  document.getElementById('disp-hp').innerText = `HP: ${meta.hp || '--'}`;
+  document.getElementById('disp-sv').innerText = `SV: ${displaySV}`;
 }
 
 const STYLE_MAPPINGS = {
@@ -519,9 +536,10 @@ function parseOsu(text) {
   }
   notes.sort((a, b) => a.time - b.time);
   stats.totalNotes = notes.length;
-  document.getElementById('disp-od').innerText = `OD: ${meta.od}`;
-  document.getElementById('disp-hp').innerText = `HP: ${meta.hp}`;
-  document.getElementById('disp-sv').innerText = `SV: ${meta.sv}`;
+  
+  // NEW: Update display stats with the loaded values + user SV
+  updateStatsDisplay();
+
   window300 = 80 - 6 * meta.od;
   window100 = 140 - 8 * meta.od;
   if (window300 < 20) window300 = 20;
@@ -732,11 +750,22 @@ function tryHit(inputType) {
   if (!playing || isPaused) return; 
   const now = (audio.currentTime * 1000);
   for (let n of notes) {
-    if (!n.hit && !n.missed && n.time < now - window100) {
-      n.missed = true;
-      triggerHitEffect('MISS', 0);
-      combo = 0;
-      hpCurrent = Math.max(0, hpCurrent - (meta.hp * 0.5));
+    if (n.hit || n.missed) continue;
+    const diff = n.time - now; 
+    const absDiff = Math.abs(diff);
+    if (absDiff <= window100) {
+      if (n.type === inputType) {
+        n.hit = true;
+        hitErrors.push(diff);
+        if (absDiff <= window300) triggerHitEffect('300', 300);
+        else triggerHitEffect('100', 100);
+      } else {
+        n.missed = true;
+        triggerHitEffect('MISS', 0);
+        combo = 0;
+        hpCurrent = Math.max(0, hpCurrent - (meta.hp * 0.5));
+      }
+      return; 
     }
   }
 }

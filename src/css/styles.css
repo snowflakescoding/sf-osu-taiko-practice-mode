@@ -150,6 +150,26 @@ button:focus { outline: none; }
 .quit-btn { background: #aa3333; }
 .quit-btn:hover { background: #cc4444; }
 
+/* FLOATING PAUSE BUTTON */
+#floatingPauseBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 100px;
+  height: 50px;
+  background: #ffcc00;
+  color: #000;
+  font-size: 1.2em;
+  border: 2px solid #fff;
+  border-radius: 30px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  z-index: 90; /* Below modals, above content */
+}
+#floatingPauseBtn:hover {
+  background: #ffe680;
+  transform: scale(1.1);
+}
+
 /* COUNTDOWN OVERLAY */
 #countdownOverlay {
   display: none;
