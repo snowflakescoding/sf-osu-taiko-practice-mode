@@ -53,8 +53,9 @@ Experience a specialized scoring system inspired by CHUNITHM. For more details, 
 
 ## 📝 Changelog
 
-### **v2025.1.8: Adding favicon for the website**
-- Favicon added, named **favicon.png**
+### **v2025.1.8: Adding favicon for the website and attach the GitHub link for the project in the website footer**
+- Favicon added, named **favicon.png**.
+- GitHub link attached with the GitHub favicon.
 
 ### **v2025.1.7: New Polish & Alignment**
 - **UI Update**: Moved the **Pause Button** to the bottom-right of the playfield with a transparent, floating style.
