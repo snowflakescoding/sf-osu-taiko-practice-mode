@@ -180,20 +180,16 @@ function updateVolumeIcon(value) {
 function updateSV(value) {
   userScrollSpeed = value / 10; 
   document.getElementById('svValue').innerText = userScrollSpeed.toFixed(1);
-  // NEW: Update Stats Panel
   updateStatsDisplay();
   saveSettings();
 }
 
 // Helper to update displayed stats (OD/HP/SV)
 function updateStatsDisplay() {
-  // If we haven't loaded a map yet, show default/empty
-  const baseSV = meta.sv || 1.4; // default if not loaded
-  const displaySV = (meta.sv) ? `${meta.sv} (x${userScrollSpeed.toFixed(1)})` : '--';
-  
   document.getElementById('disp-od').innerText = `OD: ${meta.od || '--'}`;
   document.getElementById('disp-hp').innerText = `HP: ${meta.hp || '--'}`;
-  document.getElementById('disp-sv').innerText = `SV: ${displaySV}`;
+  // FIXED: Show only the User Multiplier (e.g., "1.0") as requested
+  document.getElementById('disp-sv').innerText = `SV: ${userScrollSpeed.toFixed(1)}`;
 }
 
 const STYLE_MAPPINGS = {
@@ -537,7 +533,7 @@ function parseOsu(text) {
   notes.sort((a, b) => a.time - b.time);
   stats.totalNotes = notes.length;
   
-  // NEW: Update display stats with the loaded values + user SV
+  // NEW: Update display stats with ONLY user SV
   updateStatsDisplay();
 
   window300 = 80 - 6 * meta.od;
@@ -551,7 +547,7 @@ function update() {
   
   const now = (audio.currentTime * 1000);
   for (let n of notes) {
-    if (!n.hit && !n.missed && n.time < now - window100) {
+    if (n.hit || n.missed && n.time < now - window100) {
       n.missed = true;
       triggerHitEffect('MISS', 0);
       combo = 0;

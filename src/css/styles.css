@@ -66,17 +66,51 @@ body {
   margin: 10px auto;
 }
 
+/* GAME CONTAINER - NEW */
+.game-container {
+  position: relative; /* Allows absolute positioning inside */
+  width: 800px;
+  max-width: 95%;
+  margin: 10px auto;
+}
+
 /* CANVAS */
 canvas {
   background: #000;
   display: block;
-  margin: 10px auto;
   border: 4px solid #444;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  max-width: 95%;
-  height: auto;   
-  max-height: 60vh; 
+  width: 100%; /* Fill container */
+  height: auto;
+  max-height: 60vh;
   object-fit: contain;
+}
+
+/* FLOATING PAUSE BUTTON (Inside Game Container) */
+#floatingPauseBtn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  /* Transparent Style */
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.2em;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+#floatingPauseBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
 }
 
 /* BUTTONS */
@@ -149,26 +183,6 @@ button:focus { outline: none; }
 .pause-btn:hover { background: #666; }
 .quit-btn { background: #aa3333; }
 .quit-btn:hover { background: #cc4444; }
-
-/* FLOATING PAUSE BUTTON */
-#floatingPauseBtn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 100px;
-  height: 50px;
-  background: #ffcc00;
-  color: #000;
-  font-size: 1.2em;
-  border: 2px solid #fff;
-  border-radius: 30px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.5);
-  z-index: 90; /* Below modals, above content */
-}
-#floatingPauseBtn:hover {
-  background: #ffe680;
-  transform: scale(1.1);
-}
 
 /* COUNTDOWN OVERLAY */
 #countdownOverlay {

@@ -137,13 +137,15 @@
     </div>
   </div>
 
-  <canvas id="game" width="800" height="400"></canvas>
+  <div class="game-container">
+    <canvas id="game" width="800" height="400"></canvas>
+    <button id="floatingPauseBtn" onclick="togglePause()">⏸️</button>
+  </div>
+
   <div class="guide" id="keybindGuide"></div>
 
-  <button id="floatingPauseBtn" onclick="togglePause()">⏸️ Pause</button>
-
   <div class="footer">
-    <div class="version">Version 2025.1.6</div>
+    <div class="version">Version 2025.1.7</div>
     <div class="credits">
       Made by <a href="https://osu.ppy.sh/users/19207842" target="_blank">-[SnowFlakes]-</a> | 
       Inspired by <a href="https://osu.ppy.sh/users/22069182" target="_blank">nahieu2005</a>
