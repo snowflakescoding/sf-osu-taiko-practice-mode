@@ -187,7 +187,6 @@ function updateSV(value) {
 function updateStatsDisplay() {
   document.getElementById('disp-od').innerText = `OD: ${meta.od || '--'}`;
   document.getElementById('disp-hp').innerText = `HP: ${meta.hp || '--'}`;
-  // Show only user SV multiplier
   document.getElementById('disp-sv').innerText = `SV: ${userScrollSpeed.toFixed(1)}`;
 }
 
@@ -395,17 +394,46 @@ window.addEventListener('drop', (e) => {
   }
 });
 
-// --- PAUSE SYSTEM ---
+// --- PAUSE & LEAD-IN SYSTEM ---
 let isPaused = false;
+let leadInActive = false;
+let leadInStartTime = 0;
+let leadInPauseTime = 0;
+const LEAD_IN_DURATION = 2000; // 2 Seconds Lead-in
+
+function startLeadIn() {
+  if (!notes.length || !audio) return;
+  leadInActive = true;
+  leadInStartTime = performance.now();
+  audio.currentTime = 0;
+  playing = true;
+  isFinished = false;
+  requestAnimationFrame(() => { update(); draw(); });
+}
+
+function getGameTime() {
+  // If in lead-in, time is negative (counting up to 0)
+  if (leadInActive) {
+    return (performance.now() - leadInStartTime) - LEAD_IN_DURATION;
+  }
+  // Otherwise, use audio time
+  return audio ? (audio.currentTime * 1000) : 0;
+}
 
 function togglePause() {
   if (!playing && !isPaused) return; 
   
   if (isPaused) {
-    // Already paused
+    // Already paused - resume is handled by overlay buttons
   } else {
     isPaused = true;
-    if(audio) audio.pause();
+    if (audio) audio.pause();
+    
+    // Capture time if we pause during lead-in
+    if (leadInActive) {
+      leadInPauseTime = performance.now();
+    }
+    
     document.getElementById('pauseOverlay').style.display = 'flex';
   }
 }
@@ -429,8 +457,19 @@ function resumeGame() {
     } else {
       clearInterval(timer);
       cd.style.display = 'none';
-      if(audio) audio.play();
+      
+      // Resume Logic
       isPaused = false;
+      
+      if (leadInActive) {
+        // Adjust start time to account for the pause duration
+        const pauseDuration = performance.now() - leadInPauseTime;
+        leadInStartTime += pauseDuration;
+        // Don't play audio yet, lead-in continues
+      } else {
+        if(audio) audio.play();
+      }
+      
       requestAnimationFrame(() => { update(); draw(); });
     }
   }, 1000);
@@ -443,11 +482,8 @@ function retryGame() {
   if (cachedOsuText && audio) {
     parseOsu(cachedOsuText);
     audio.volume = currentVolume / 100;
-    audio.currentTime = 0;
-    audio.play();
-    playing = true;
-    isFinished = false;
-    requestAnimationFrame(() => { update(); draw(); });
+    // RESTART with lead-in
+    startLeadIn();
   }
 }
 
@@ -456,6 +492,7 @@ function quitGame() {
   isPaused = false;
   playing = false;
   isFinished = false;
+  leadInActive = false;
   
   if(audio) {
     audio.pause();
@@ -539,7 +576,18 @@ function parseOsu(text) {
 function update() {
   if (!playing || isPaused) return; 
   
-  const now = (audio.currentTime * 1000);
+  // Use unified game time (handles negative lead-in)
+  let now = getGameTime();
+
+  // Handle transition from Lead-in to Audio
+  if (leadInActive && now >= 0) {
+    leadInActive = false;
+    if (audio) {
+        audio.play();
+        now = audio.currentTime * 1000; // Snap to audio time
+    }
+  }
+
   for (let n of notes) {
     if (!n.hit && !n.missed && n.time < now - window100) {
       n.missed = true;
@@ -571,13 +619,18 @@ function draw() {
 
   if (!playing && !isFinished) return;
   
-  const now = audio ? (audio.currentTime * 1000) : 0;
+  // Use unified game time for drawing
+  const now = getGameTime();
   const currentSpeed = BASE_SPEED * meta.sv * userScrollSpeed;
 
   for (let i = notes.length - 1; i >= 0; i--) {
     let n = notes[i];
     if (n.hit) continue;
+    
+    // Logic: If now is negative (e.g. -2000), (n.time - now) becomes larger,
+    // pushing the note further to the right, creating the scroll-in effect.
     const x = HIT_X + (n.time - now) * currentSpeed;
+    
     if (x < -60 || x > canvas.width + 60) continue;
     const radius = n.isBig ? 50 : 30;
     const color = n.type === 'don' ? '#ff4000' : '#00aaff';
@@ -674,7 +727,7 @@ function drawUI() {
   ctx.textAlign = 'right';
   ctx.fillText(Math.floor(score).toLocaleString().padStart(7, '0'), canvas.width - 20, 50);
 
-  // Combo - UPDATED to be slightly higher (320px) and safer
+  // Combo
   if (combo > 0) {
     ctx.fillStyle = '#ffcc00';
     ctx.font = 'bold 50px Arial';
@@ -694,7 +747,6 @@ function drawUI() {
   ctx.fillStyle = '#fff'; ctx.fillRect(hpX + hpW * 0.5, hpY - 5, 2, hpH + 10);
 }
 
-// FIX: Updated to use English text to avoid "question mark" squares
 function updateAndDrawEffects() {
   const now = performance.now();
   for (let i = hitEffects.length - 1; i >= 0; i--) {
@@ -705,7 +757,6 @@ function updateAndDrawEffects() {
     const alpha = 1 - (age / 400);
     ctx.save(); ctx.globalAlpha = alpha; ctx.textAlign = 'center';
     
-    // CHANGED: Use English text to fix rendering issues
     if (eff.text === '300') { 
         ctx.fillStyle = '#f6d123'; ctx.font = 'bold 45px Arial'; ctx.fillText("GREAT", HIT_X, 100 - yOffset);
     } else if (eff.text === '100') {
@@ -741,7 +792,10 @@ function drawURBar() {
 
 function tryHit(inputType) {
   if (!playing || isPaused) return; 
-  const now = (audio.currentTime * 1000);
+  
+  // Use unified game time for logic
+  const now = getGameTime();
+  
   for (let n of notes) {
     if (n.hit || n.missed) continue;
     const diff = n.time - now; 
@@ -813,11 +867,8 @@ playBtn.onclick = () => {
   if (!notes.length || !audio) { alert(t('missingFiles')); return; }
   if (cachedOsuText) parseOsu(cachedOsuText);
   audio.volume = currentVolume / 100; 
-  audio.currentTime = 0;
-  audio.play();
-  playing = true;
-  isFinished = false;
-  requestAnimationFrame(() => { update(); draw(); });
+  // Trigger Lead-in Sequence
+  startLeadIn();
 };
 
 draw();
