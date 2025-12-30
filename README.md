@@ -54,20 +54,20 @@ Experience a specialized scoring system inspired by CHUNITHM. For more details, 
 ## 📝 Changelog
 
 ### **v2025.1.9: Accuracy Logic & Playfield Polish**
-- **Accuracy System**:
+1. **Accuracy System**:
 
-+ Added real-time Accuracy (%) display below the score.
-+ Updated the accuracy formula to scale up to 101% (matching the Chunithm scoring max), where Perfect hits contribute more than standard 100% logic.
+- Added real-time Accuracy (%) display below the score.
+- Updated the accuracy formula to scale up to 101% (matching the Chunithm scoring max), where Perfect hits contribute more than standard 100% logic.
 
-- **UI Enhancements**:
+2. **UI Enhancements**:
 
-+ **Pause Button**: Relocated to the bottom-right of the playfield as a floating, transparent icon.
-+ **SV Display**: The stats panel now strictly displays the user's custom SV multiplier (e.g., 1.0) instead of the map's internal velocity.
+- **Pause Button**: Relocated to the bottom-right of the playfield as a floating, transparent icon.
+- **SV Display**: The stats panel now strictly displays the user's custom SV multiplier (e.g., 1.0) instead of the map's internal velocity.
 
-- **Visual Fixes**:
+3. **Visual Fixes**:
 
-+ Changed hit effect text from Japanese characters to English ("GREAT", "GOOD", "MISS") to resolve font rendering issues (the "question mark" boxes).
-+ Adjusted the game container layout for better positioning of the new pause button.
+- Changed hit effect text from Japanese characters to English ("GREAT", "GOOD", "MISS") to resolve font rendering issues (the "question mark" boxes).
+- Adjusted the game container layout for better positioning of the new pause button.
 
 ### **v2025.1.8: Favicon & GitHub Repository Link**
 - Favicon: Added, named **favicon.png**.
