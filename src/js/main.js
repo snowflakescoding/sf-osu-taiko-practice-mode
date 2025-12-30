@@ -399,7 +399,7 @@ let isPaused = false;
 let leadInActive = false;
 let leadInStartTime = 0;
 let leadInPauseTime = 0;
-const LEAD_IN_DURATION = 2000; // 2 Seconds Lead-in
+const LEAD_IN_DURATION = 2000; 
 
 function startLeadIn() {
   if (!notes.length || !audio) return;
@@ -412,11 +412,9 @@ function startLeadIn() {
 }
 
 function getGameTime() {
-  // If in lead-in, time is negative (counting up to 0)
   if (leadInActive) {
     return (performance.now() - leadInStartTime) - LEAD_IN_DURATION;
   }
-  // Otherwise, use audio time
   return audio ? (audio.currentTime * 1000) : 0;
 }
 
@@ -424,12 +422,11 @@ function togglePause() {
   if (!playing && !isPaused) return; 
   
   if (isPaused) {
-    // Already paused - resume is handled by overlay buttons
+    // Already paused
   } else {
     isPaused = true;
     if (audio) audio.pause();
     
-    // Capture time if we pause during lead-in
     if (leadInActive) {
       leadInPauseTime = performance.now();
     }
@@ -458,14 +455,11 @@ function resumeGame() {
       clearInterval(timer);
       cd.style.display = 'none';
       
-      // Resume Logic
       isPaused = false;
       
       if (leadInActive) {
-        // Adjust start time to account for the pause duration
         const pauseDuration = performance.now() - leadInPauseTime;
         leadInStartTime += pauseDuration;
-        // Don't play audio yet, lead-in continues
       } else {
         if(audio) audio.play();
       }
@@ -482,7 +476,6 @@ function retryGame() {
   if (cachedOsuText && audio) {
     parseOsu(cachedOsuText);
     audio.volume = currentVolume / 100;
-    // RESTART with lead-in
     startLeadIn();
   }
 }
@@ -576,15 +569,13 @@ function parseOsu(text) {
 function update() {
   if (!playing || isPaused) return; 
   
-  // Use unified game time (handles negative lead-in)
   let now = getGameTime();
 
-  // Handle transition from Lead-in to Audio
   if (leadInActive && now >= 0) {
     leadInActive = false;
     if (audio) {
         audio.play();
-        now = audio.currentTime * 1000; // Snap to audio time
+        now = audio.currentTime * 1000; 
     }
   }
 
@@ -619,7 +610,6 @@ function draw() {
 
   if (!playing && !isFinished) return;
   
-  // Use unified game time for drawing
   const now = getGameTime();
   const currentSpeed = BASE_SPEED * meta.sv * userScrollSpeed;
 
@@ -627,8 +617,6 @@ function draw() {
     let n = notes[i];
     if (n.hit) continue;
     
-    // Logic: If now is negative (e.g. -2000), (n.time - now) becomes larger,
-    // pushing the note further to the right, creating the scroll-in effect.
     const x = HIT_X + (n.time - now) * currentSpeed;
     
     if (x < -60 || x > canvas.width + 60) continue;
@@ -699,8 +687,9 @@ function finishGame() {
   else if (finalScore >= 500000) { rank = 'C'; rankClass = 'rank-C'; }
   
   const totalHits = stats.perfect + stats.good + stats.miss;
+  // UPDATED: Accuracy calc to max out at 101%
   const acc = totalHits === 0 ? 0 : 
-    ((stats.perfect * 100 + stats.good * 50) / (totalHits * 100)) * 100;
+    ((stats.perfect * 1.0 + stats.good * 0.5) / totalHits) * 101;
   
   document.getElementById('resScore').innerText = finalScore.toLocaleString();
   document.getElementById('resRank').innerText = rank;
@@ -727,6 +716,15 @@ function drawUI() {
   ctx.textAlign = 'right';
   ctx.fillText(Math.floor(score).toLocaleString().padStart(7, '0'), canvas.width - 20, 50);
 
+  // UPDATED: Accuracy display (101% scale)
+  const totalHits = stats.perfect + stats.good + stats.miss;
+  const currentAcc = totalHits === 0 ? 0 : 
+    ((stats.perfect * 1.0 + stats.good * 0.5) / totalHits) * 101;
+  
+  ctx.font = 'bold 18px monospace';
+  ctx.fillStyle = '#ccc'; 
+  ctx.fillText(currentAcc.toFixed(2) + '%', canvas.width - 20, 75);
+
   // Combo
   if (combo > 0) {
     ctx.fillStyle = '#ffcc00';
@@ -746,6 +744,8 @@ function drawUI() {
   ctx.fillStyle = hpColor; ctx.fillRect(hpX, hpY, hpW * fillPct, hpH);
   ctx.fillStyle = '#fff'; ctx.fillRect(hpX + hpW * 0.5, hpY - 5, 2, hpH + 10);
 }
+
+// ... [Rest of logic remains consistent with previous version] ...
 
 function updateAndDrawEffects() {
   const now = performance.now();
@@ -793,7 +793,6 @@ function drawURBar() {
 function tryHit(inputType) {
   if (!playing || isPaused) return; 
   
-  // Use unified game time for logic
   const now = getGameTime();
   
   for (let n of notes) {
@@ -867,7 +866,6 @@ playBtn.onclick = () => {
   if (!notes.length || !audio) { alert(t('missingFiles')); return; }
   if (cachedOsuText) parseOsu(cachedOsuText);
   audio.volume = currentVolume / 100; 
-  // Trigger Lead-in Sequence
   startLeadIn();
 };
 
