@@ -10,7 +10,8 @@ const translations = {
     selectOsu: '1. Chọn File .osu',
     selectAudio: '2. Chọn Nhạc',
     notSelected: 'Chưa chọn',
-    play: 'CHƠI',
+    // CHANGED: Match "3. Start" context
+    play: '3. Bắt Đầu',
     settingsTitle: '⚙️ CÀI ĐẶT',
     keybindStyle: 'Kiểu Phím Bấm',
     customKeybinds: 'Tùy Chỉnh Phím',
@@ -30,7 +31,8 @@ const translations = {
     selectOsu: '1. Select .osu File',
     selectAudio: '2. Select Audio',
     notSelected: 'Not selected',
-    play: 'PLAY',
+    // CHANGED: Match "3. Start" context
+    play: '3. Start',
     settingsTitle: '⚙️ SETTINGS',
     keybindStyle: 'Keybind Style',
     customKeybinds: 'Custom Keybinds',
@@ -50,7 +52,8 @@ const translations = {
     selectOsu: '1. .osuファイルを選択',
     selectAudio: '2. 音楽を選択',
     notSelected: '未選択',
-    play: 'プレイ',
+    // CHANGED: Match "3. Start" context
+    play: '3. スタート',
     settingsTitle: '⚙️ 設定',
     keybindStyle: 'キー配置スタイル',
     customKeybinds: 'カスタムキー',
@@ -716,7 +719,7 @@ function drawUI() {
   ctx.textAlign = 'right';
   ctx.fillText(Math.floor(score).toLocaleString().padStart(7, '0'), canvas.width - 20, 50);
 
-  // UPDATED: Accuracy display (101% scale)
+  // NEW: Accuracy display below Score (101% Scale)
   const totalHits = stats.perfect + stats.good + stats.miss;
   const currentAcc = totalHits === 0 ? 0 : 
     ((stats.perfect * 1.0 + stats.good * 0.5) / totalHits) * 101;

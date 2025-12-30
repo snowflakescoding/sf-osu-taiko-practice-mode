@@ -53,6 +53,9 @@ Experience a specialized scoring system inspired by CHUNITHM. For more details, 
 
 ## 📝 Changelog
 
+### **v2025.1.10: Button Name Change**
+- Change the **PLAY** button to **3. Start**
+
 ### **v2025.1.9: Accuracy Logic & Audio Lead-In System**
 1. **Accuracy System**:
 
