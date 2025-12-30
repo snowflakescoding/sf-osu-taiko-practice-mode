@@ -59,7 +59,7 @@ Experience a specialized scoring system inspired by CHUNITHM. For more details, 
 - Added real-time Accuracy (%) display below the score.
 - Updated the accuracy formula to scale up to 101% (matching the Chunithm scoring max), where Perfect hits contribute more than standard 100% logic.
 
-2. **Audio Lead-In System**
+2. **Audio Lead-In System**:
 **Lead-In System Process**: 
 - When you click **PLAY** or **Retry**, the game now enters a **"Lead-In"** phase for 2 seconds.
 - **Visuals**: Notes will start scrolling immediately from the right.
