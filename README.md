@@ -53,21 +53,23 @@ Experience a specialized scoring system inspired by CHUNITHM. For more details, 
 
 ## 📝 Changelog
 
-### **v2025.1.9: Accuracy Logic & Playfield Polish**
+### **v2025.1.9: Accuracy Logic & Audio Lead-In System**
 1. **Accuracy System**:
 
 - Added real-time Accuracy (%) display below the score.
 - Updated the accuracy formula to scale up to 101% (matching the Chunithm scoring max), where Perfect hits contribute more than standard 100% logic.
 
-2. **UI Enhancements**:
+2. **Audio Lead-In System**
+**Lead-In System Process**: 
+- When you click **PLAY** or **Retry**, the game now enters a **"Lead-In"** phase for 2 seconds.
+- **Visuals**: Notes will start scrolling immediately from the right.
+- **Audio**: Music will wait and start exactly when the time hits 0.
 
-- **Pause Button**: Relocated to the bottom-right of the playfield as a floating, transparent icon.
-- **SV Display**: The stats panel now strictly displays the user's custom SV multiplier (e.g., 1.0) instead of the map's internal velocity.
+**Corrected Pause Logic**: 
+- If you pause during this lead-in, the timer pauses correctly so the music doesn't desync when you resume.
 
-3. **Visual Fixes**:
-
-- Changed hit effect text from Japanese characters to English ("GREAT", "GOOD", "MISS") to resolve font rendering issues (the "question mark" boxes).
-- Adjusted the game container layout for better positioning of the new pause button.
+**Synced Gameplay**: 
+- The hit detection and drawing now use a unified getGameTime() function that seamlessly handles both the "Lead-In" (negative time) and "Playing" (audio time) states.
 
 ### **v2025.1.8: Favicon & GitHub Repository Link**
 - Favicon: Added, named **favicon.png**.
